@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import LogoutButton from '@/components/logout-button'
+import NotificationBell from '@/components/notification-bell'
 
 const AREA_COLORS: Record<string, string> = {
   'Scienze & Natura': 'from-cyan-500/20 to-cyan-500/5 border-cyan-500/30',
@@ -39,8 +40,8 @@ export default async function DimensionsPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link href="/dimensions" className="text-2xl font-bold tracking-tight text-lime-400">coNNect</Link>
           <div className="flex items-center gap-4">
-            <Link href="/onboarding" className="text-sm text-neutral-400 hover:text-lime-400">
-              Come funziona?
+            <Link href="/leaderboard" className="text-sm text-neutral-400 hover:text-lime-400">
+              🏆 Classifica
             </Link>
             <Link href="/connections" className="text-sm text-neutral-400 hover:text-lime-400">
               ⇕ Connessioni
@@ -48,6 +49,7 @@ export default async function DimensionsPage() {
             <Link href="/profile" className="text-sm text-neutral-400 hover:text-lime-400">
               👤 Profilo
             </Link>
+            <NotificationBell userId={user.id} />
             <LogoutButton />
           </div>
         </div>

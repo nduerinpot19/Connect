@@ -3,6 +3,8 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import NewThoughtForm from '@/components/new-thought-form'
 import ConnectButton from '@/components/connect-button'
+import ThoughtRating from '@/components/thought-rating'
+import TranslateButton from '@/components/translate-button'
 
 const MOOD_STYLES: Record<string, string> = {
   positivo: 'border-emerald-400/30 text-emerald-300',
@@ -37,11 +39,19 @@ export default async function DimensionDetailPage({
 
   const { data: thoughts } = await supabase
     .from('thoughts')
-    .select('id, user_id, content, mood, tags, created_at, connections_count, avg_connection_score, users(username, badge_level, country)')
+    .select('id, user_id, content, mood, tags, created_at, connections_count, avg_connection_score, avg_rating, ratings_count, users(username, badge_level, country)')
     .eq('dimension_id', dimension.id)
     .eq('is_public', true)
-    .order('created_at', { ascending: false })
+    .order('avg_rating', { ascending: false })
     .limit(30)
+
+  // Recupera i voti dell'utente corrente su questi pensieri
+  const thoughtIds = (thoughts ?? []).map(t => t.id)
+  const { data: myRatings } = await supabase
+    .from('thought_ratings')
+    .select('thought_id, score')
+    .eq('user_id', user.id)
+    .in('thought_id', thoughtIds.length > 0 ? thoughtIds : ['00000000-0000-0000-0000-000000000000'])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-950 to-neutral-900 text-white">
@@ -81,6 +91,7 @@ export default async function DimensionDetailPage({
 
           {thoughts?.map((t) => {
             const author = Array.isArray(t.users) ? t.users[0] : t.users
+            const myRating = myRatings?.find(r => r.thought_id === t.id)?.score ?? null
             return (
               <article
                 key={t.id}
@@ -119,11 +130,19 @@ export default async function DimensionDetailPage({
                   </div>
                 )}
 
-                <div className="mt-3 flex items-center gap-4 text-xs text-neutral-500">
-                  <span>⇕ {t.connections_count} connessioni</span>
-                  {t.avg_connection_score > 0 && (
-                    <span>★ {t.avg_connection_score.toFixed(1)}/10</span>
-                  )}
+                {/* Traduzione */}
+                <TranslateButton text={t.content} />
+
+                {/* Rating e azioni */}
+                <div className="mt-3 flex items-center gap-3 flex-wrap text-xs text-neutral-500">
+                  <ThoughtRating
+                    thoughtId={t.id}
+                    currentScore={myRating}
+                    avgRating={t.avg_rating ?? 0}
+                    ratingsCount={t.ratings_count ?? 0}
+                    isOwnThought={t.user_id === user.id}
+                  />
+                  <span>⇕ {t.connections_count}</span>
                   <span className="ml-auto">
                     {new Date(t.created_at).toLocaleDateString('it-IT', {
                       day: 'numeric',
