@@ -37,12 +37,17 @@ export default async function DimensionsPage() {
     <div className="min-h-screen bg-gradient-to-br from-neutral-950 to-neutral-900 text-white">
       <header className="sticky top-0 z-10 border-b border-neutral-800 bg-neutral-950/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <h1 className="text-2xl font-bold tracking-tight text-lime-400">coNNect</h1>
+          <Link href="/dimensions" className="text-2xl font-bold tracking-tight text-lime-400">coNNect</Link>
           <div className="flex items-center gap-4">
-            <Link href="/connections" className="text-sm text-neutral-400 hover:text-lime-400">
-              ⇕ Le mie connessioni
+            <Link href="/onboarding" className="text-sm text-neutral-400 hover:text-lime-400">
+              Come funziona?
             </Link>
-            <span className="text-sm text-neutral-400">{user.email}</span>
+            <Link href="/connections" className="text-sm text-neutral-400 hover:text-lime-400">
+              ⇕ Connessioni
+            </Link>
+            <Link href="/profile" className="text-sm text-neutral-400 hover:text-lime-400">
+              👤 Profilo
+            </Link>
             <LogoutButton />
           </div>
         </div>

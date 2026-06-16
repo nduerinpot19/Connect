@@ -36,7 +36,7 @@ export default function RegisterPage() {
 
     setSuccess(true)
     setLoading(false)
-    setTimeout(() => router.push('/login'), 2000)
+    setTimeout(() => router.push('/onboarding'), 2000)
   }
 
   return (
