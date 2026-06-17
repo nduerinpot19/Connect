@@ -49,7 +49,7 @@ export default function NewThoughtForm({
       .filter(Boolean)
       .map((t) => (t.startsWith('#') ? t : `#${t}`))
 
-    const { error } = await supabase.from('thoughts').insert({
+    const { data: inserted, error } = await supabase.from('thoughts').insert({
       user_id: user.id,
       dimension_id: dimensionId,
       dimension_number: dimensionNumber,
@@ -57,12 +57,21 @@ export default function NewThoughtForm({
       mood,
       tags: tagList,
       is_public: isPublic,
-    })
+    }).select('id').single()
 
     if (error) {
       setError(error.message)
       setLoading(false)
       return
+    }
+
+    // Analisi invisibile in background — non blocca l'utente
+    if (inserted?.id) {
+      fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ thought_id: inserted.id }),
+      }).catch(() => {}) // silenzioso
     }
 
     setContent('')

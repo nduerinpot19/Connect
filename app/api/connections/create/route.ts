@@ -100,6 +100,13 @@ export async function POST(request: Request) {
     await supabase.rpc('check_star_unlock', { p_a: user.id, p_b: thoughtB.user_id })
   }
 
+  // Analisi affinità semantica in background — non blocca la risposta
+  fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL ? '' : 'http://localhost:3000'}/api/analyze`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ connection_id: connection.id }),
+  }).catch(() => {}) // silenzioso
+
   return NextResponse.json({ connection }, { status: 201 })
 }
 
